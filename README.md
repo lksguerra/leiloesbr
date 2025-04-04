@@ -1,36 +1,161 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sistema de Leilões
 
-## Getting Started
+Sistema administrativo para visualização e acompanhamento de leilões judiciais e extrajudiciais.
 
-First, run the development server:
+## Tecnologias Utilizadas
 
+- React
+- Next.js 14
+- TypeScript
+- Tailwind CSS
+- Supabase (Autenticação e Banco de Dados)
+
+## Funcionalidades
+
+- Interface moderna e responsiva
+- Autenticação segura
+- Visualização de leilões em grid
+- Filtros avançados para busca de imóveis
+- Detalhes completos dos imóveis
+- Sistema de favoritos
+- Atualizações em tempo real
+- Integração com plataformas de leilão
+
+## Pré-requisitos
+
+- Node.js (versão 18 ou superior)
+- npm ou yarn
+- Conta no Supabase
+
+## Configuração do Ambiente
+
+1. Clone o repositório:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone [url-do-repositorio]
+cd admin-auctions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Instale as dependências:
+```bash
+npm install
+# ou
+yarn install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Configure as variáveis de ambiente:
+Crie um arquivo `.env.local` na raiz do projeto com as seguintes variáveis:
+```env
+NEXT_PUBLIC_SUPABASE_URL=sua_url_do_supabase
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima_do_supabase
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Inicie o servidor de desenvolvimento:
+```bash
+npm run dev
+# ou
+yarn dev
+```
 
-## Learn More
+## Estrutura do Banco de Dados
 
-To learn more about Next.js, take a look at the following resources:
+### Tabela: auctions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```sql
+create table auctions (
+  id uuid default uuid_generate_v4() primary key,
+  title text not null,
+  description text,
+  type text not null check (type in ('judicial', 'extrajudicial')),
+  starting_price decimal(10,2) not null,
+  current_price decimal(10,2) not null,
+  end_date timestamp with time zone not null,
+  status text not null check (status in ('active', 'ended', 'cancelled')),
+  location text not null,
+  category text not null,
+  created_by uuid references auth.users(id),
+  created_at timestamp with time zone default now(),
+  updated_at timestamp with time zone default now(),
+  images text[],
+  image_url text,
+  address text,
+  area numeric,
+  bedrooms integer,
+  bathrooms integer,
+  parking_spots integer,
+  is_favorite boolean default false,
+  link_acesso text
+);
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+-- Trigger para atualizar o updated_at
+create or replace function update_updated_at_column()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
 
-## Deploy on Vercel
+create trigger update_auctions_updated_at
+  before update on auctions
+  for each row
+  execute function update_updated_at_column();
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Estrutura do Projeto
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+admin-auctions/
+├── src/
+│   ├── app/
+│   │   ├── (auth)/
+│   │   │   └── login/
+│   │   │       └── page.tsx
+│   │   ├── (dashboard)/
+│   │   │   ├── dashboard/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── auctions/
+│   │   │   │       ├── page.tsx
+│   │   │   │       └── [id]/
+│   │   │   │           └── page.tsx
+│   │   │   └── layout.tsx
+│   │   └── layout.tsx
+│   ├── components/
+│   │   └── ui/
+│   │       ├── AuctionFilters.tsx
+│   │       ├── Loading.tsx
+│   │       ├── Pagination.tsx
+│   │       ├── PropertyPlaceholder.tsx
+│   │       └── Toast.tsx
+│   ├── hooks/
+│   │   └── useAuth.ts
+│   ├── lib/
+│   │   └── supabase/
+│   │       └── config.ts
+│   └── types/
+│       └── index.ts
+├── public/
+├── .env.local
+├── package.json
+└── README.md
+```
+
+## Uso
+
+1. Faça login no sistema usando suas credenciais
+2. Na página principal, você verá uma lista de leilões disponíveis
+3. Use os filtros para encontrar imóveis específicos
+4. Clique no ícone de olho para ver detalhes completos do imóvel
+5. Marque seus leilões favoritos clicando no ícone de coração
+6. Acesse o leilão na plataforma externa através do botão "Tenho Interesse"
+
+## Contribuição
+
+1. Faça um Fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## Licença
+
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE.md](LICENSE.md) para mais detalhes.
