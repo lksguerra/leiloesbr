@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/config'
 import { Auction } from '@/types'
-import { FaBed, FaBath, FaCar, FaRuler, FaEye, FaGavel, FaHome, FaUser, FaChartBar } from 'react-icons/fa'
+import { FaEye, FaGavel, FaHome, FaUser, FaChartBar } from 'react-icons/fa'
 import Loading from '@/components/ui/Loading'
 import Link from 'next/link'
 
@@ -83,10 +83,6 @@ export default function DashboardPage() {
         <Loading message="Carregando dados..." />
       </div>
     )
-  }
-
-  const calculateDiscount = (original: number, current: number) => {
-    return Math.round(((original - current) / original) * 100)
   }
 
   return (

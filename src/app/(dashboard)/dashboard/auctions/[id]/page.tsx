@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase/config'
 import { Auction } from '@/types'
-import { FaMapMarkerAlt, FaFileDownload, FaExternalLinkAlt, FaArrowLeft } from 'react-icons/fa'
+import { FaBed, FaBath, FaCar, FaRuler, FaMapMarkerAlt, FaFileDownload, FaExternalLinkAlt, FaArrowLeft } from 'react-icons/fa'
 import Loading from '@/components/ui/Loading'
 import PropertyPlaceholder from '@/components/ui/PropertyPlaceholder'
 import Link from 'next/link'
@@ -77,7 +77,7 @@ export default function AuctionDetailsPage() {
           {auction.image_url || auction.images?.[0] ? (
             <div className="relative w-full h-full">
               <Image
-                src={auction.image_url || auction.images?.[0]}
+                src={auction.image_url || auction.images?.[0] || ''}
                 alt={auction.title}
                 fill
                 className="object-cover"
