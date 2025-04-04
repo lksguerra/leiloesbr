@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase/config'
 import { FaHome, FaGavel, FaUserCircle, FaSignOutAlt } from 'react-icons/fa'
 import Loading from '@/components/ui/Loading'
+import Link from 'next/link'
 
 export default function DashboardLayout({
   children,
@@ -16,11 +17,7 @@ export default function DashboardLayout({
   const [loading, setLoading] = useState(true)
   const [userEmail, setUserEmail] = useState<string | null>(null)
 
-  useEffect(() => {
-    checkUser()
-  }, [])
-
-  const checkUser = async () => {
+  const checkUser = useCallback(async () => {
     try {
       const { data: { session }, error } = await supabase.auth.getSession()
       if (error) throw error
@@ -36,7 +33,11 @@ export default function DashboardLayout({
       console.error('Erro ao verificar usuário:', error)
       router.push('/login')
     }
-  }
+  }, [router])
+
+  useEffect(() => {
+    checkUser()
+  }, [checkUser])
 
   const handleSignOut = async () => {
     try {
@@ -83,7 +84,7 @@ export default function DashboardLayout({
                   <FaHome className="mr-2 h-4 w-4" />
                   Painel
                 </a>
-                <a
+                <Link
                   href="/dashboard/auctions"
                   className={`inline-flex items-center px-4 py-2 text-sm font-medium border-b-2 ${
                     pathname.startsWith('/dashboard/auctions')
@@ -93,7 +94,7 @@ export default function DashboardLayout({
                 >
                   <FaGavel className="mr-2 h-4 w-4" />
                   Leilões
-                </a>
+                </Link>
               </div>
             </div>
 

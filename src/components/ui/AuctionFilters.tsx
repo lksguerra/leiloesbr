@@ -16,7 +16,7 @@ interface AuctionFiltersProps {
     parkingSpots?: string
     isFavorite?: boolean
   }
-  onFilterChange: (filters: any) => void
+  onFilterChange: (filters: AuctionFiltersProps['filters']) => void
   onClearFilters: () => void
 }
 

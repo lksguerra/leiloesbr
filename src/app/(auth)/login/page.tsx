@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/config'
 import { FaGavel, FaLock, FaEnvelope } from 'react-icons/fa'
-import Loading from '@/components/ui/Loading'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -27,8 +26,9 @@ export default function LoginPage() {
       if (error) throw error
 
       router.push('/dashboard')
-    } catch (error: any) {
-      setError(error.message || 'E-mail ou senha inválidos')
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'E-mail ou senha inválidos'
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
